@@ -433,6 +433,11 @@
       부산찬스는 10년 동안 꾸준히 넣는 구조이므로 <strong>복리 효과</strong>로 자산이 기하급수적으로 늘어납니다.
     </div>
 
+    <div style="background:var(--bg-success);border-radius:12px;padding:14px;font-size:12px;color:var(--text-success);line-height:1.7;margin-top:12px;">
+      <strong>🏦 참고: 담보대출 제도</strong><br>
+      기금 자산을 담보로 시중 금리보다 1~2% 낮은 대출을 받을 수 있습니다.<br>
+      기금 내 자산은 줄지 않고 계속 복리 운용됩니다. 대출은 별도로 상환합니다.
+    </div>
     <button onclick="closeRateInfo()" style="width:100%;margin-top:16px;padding:12px;background:var(--text-primary);color:var(--bg-primary);border:none;border-radius:8px;font-size:13px;font-weight:500;">이해했습니다</button>
   </div>
 </div>
@@ -804,6 +809,10 @@ const PARK_IMAGE_URL = "data:image/jpeg;base64,data:image/jpeg;base64,/9j/4AAQSk
         + '</div>';
     });
     grid.innerHTML = html;
+    // 담보대출 안내 문구
+    grid.innerHTML += '<div style="grid-column: 1 / -1; background: var(--bg-info); border-radius: var(--radius-md); padding: 12px; margin-top: 8px; font-size: 13px; color: var(--text-info); line-height: 1.6;">'
+      + '🏦 <strong>중간에 돈이 필요하면?</strong> 기금 자산을 담보로 시중보다 1~1.5% 낮은 금리로 대출 가능. '
+      + '기금 속 내 자산은 줄지 않고 계속 복리로 불어납니다.</div>';
   }
   
 
@@ -821,10 +830,10 @@ const PARK_IMAGE_URL = "data:image/jpeg;base64,data:image/jpeg;base64,/9j/4AAQSk
     // 생애 이벤트 정의 (나이 기준)
     var events = [
       {age: startAge, icon: '🎯', label: '부산찬스 가입', desc: '첫씨앗계좌 개설, 매달 저축 시작', color: '#1D9E75'},
-      {age: Math.max(startAge+2, 27), icon: '💑', label: '결혼 자금', desc: '담보대출로 해지 없이 활용 가능', color: '#534AB7'},
+      {age: Math.max(startAge+2, 27), icon: '💑', label: '결혼 자금', desc: '자산을 담보로 시중보다 1.5% 낮은 금리 대출 · 기금 자산은 그대로 유지', color: '#534AB7'},
       {age: startAge+10, icon: '💰', label: '10년 달성 · 1억', desc: '3축 이수 완료, 자산 1억 확보', color: '#085041', highlight: true},
-      {age: Math.max(startAge+12, 37), icon: '🏠', label: '내 집 마련', desc: '자산 담보 주택대출 유리한 조건', color: '#378ADD'},
-      {age: Math.max(startAge+15, 40), icon: '👶', label: '자녀 교육', desc: '교육비 인출 가능 (복리 유지)', color: '#BA7517'},
+      {age: Math.max(startAge+12, 37), icon: '🏠', label: '내 집 마련', desc: '최대 70% 담보대출 (시중 -1.5%p) · 해지 없이 복리 운용 계속', color: '#378ADD'},
+      {age: Math.max(startAge+15, 40), icon: '👶', label: '자녀 교육', desc: '최대 40% 담보대출 (시중 -1.0%p) · 기금 자산은 줄지 않습니다', color: '#BA7517'},
       {age: 50, icon: '🎓', label: '자녀 독립', desc: '자산이 3억 이상으로 성장', color: '#993556'},
       {age: 60, icon: '🌅', label: '은퇴 · 복합소득', desc: '국민연금+퇴직연금+첫씨앗계좌 = 월 301만', color: '#085041', highlight: true}
     ].filter(function(e) { return e.age >= startAge && e.age <= 60; });
@@ -987,13 +996,37 @@ const PARK_IMAGE_URL = "data:image/jpeg;base64,data:image/jpeg;base64,/9j/4AAQSk
     });
     const totalReturn = totalAsset - totalPaid;
     const container = document.getElementById('familyResults');
+    // 자녀들의 60세 자산 합산 (별도 표시)
+    let totalAge60 = 0;
+    results.forEach(r => {
+      if (r.input.track === 'youth' && r.result.age60Asset) totalAge60 += r.result.age60Asset;
+    });
+    
     let html = '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 1rem;">'
-      + '<div style="background: var(--bg-success); border-radius: var(--radius-md); padding: 1rem;"><div style="font-size: 14px; color: var(--text-success); margin-bottom: 6px;">가족 합산 자산</div><div style="font-size: 28px; font-weight: 600; color: var(--text-success);">' + fmtShort(totalAsset) + '</div></div>'
+      + '<div style="background: var(--bg-success); border-radius: var(--radius-md); padding: 1rem;"><div style="font-size: 14px; color: var(--text-success); margin-bottom: 6px;">📅 가입 10년 후 가족 합산</div><div style="font-size: 28px; font-weight: 600; color: var(--text-success);">' + fmtShort(totalAsset) + '</div><div style="font-size: 12px; color: var(--text-success); margin-top: 4px;">각 구성원의 10년 후 자산 합계</div></div>'
       + '<div style="background: var(--bg-secondary); border-radius: var(--radius-md); padding: 1rem;"><div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 6px;">가족 총 납입</div><div style="font-size: 28px; font-weight: 600;">' + fmtShort(totalPaid) + '</div></div>'
-      + '<div style="background: var(--bg-secondary); border-radius: var(--radius-md); padding: 1rem;"><div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 6px;">가족 순수익</div><div style="font-size: 28px; font-weight: 600; color: var(--text-success);">+' + fmtShort(totalReturn) + '</div></div>'
+      + '<div style="background: var(--bg-secondary); border-radius: var(--radius-md); padding: 1rem;"><div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 6px;">불어난 금액</div><div style="font-size: 28px; font-weight: 600; color: var(--text-success);">+' + fmtShort(totalReturn) + '</div></div>'
       + '<div style="background: var(--bg-secondary); border-radius: var(--radius-md); padding: 1rem;"><div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 6px;">구성</div><div style="font-size: 18px; font-weight: 500;">자녀 ' + childCount + ' · 부모 ' + parentCount + '</div></div>'
       + '</div>';
-    html += '<div style="background: var(--bg-primary); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem; margin-bottom: 1rem;"><h3>구성원별 자산</h3><table style="width: 100%; font-size: 13px; border-collapse: collapse;"><thead><tr style="border-bottom: 0.5px solid var(--border);"><th style="text-align:left; padding:8px; font-weight:500; font-size:14px; color:var(--text-secondary);">구성원</th><th style="text-align:left; padding:8px; font-weight:500; font-size:14px; color:var(--text-secondary);">트랙</th><th style="text-align:right; padding:8px; font-weight:500; font-size:14px; color:var(--text-secondary);">납입</th><th style="text-align:right; padding:8px; font-weight:500; font-size:14px; color:var(--text-secondary);">최종자산</th></tr></thead><tbody>';
+    // 자녀 60세 자산 별도 카드 (자녀가 있고 만기 유지 시)
+    if (totalAge60 > 0) {
+      html += '<div style="background: linear-gradient(135deg, #2A1F3D 0%, #4a2868 100%); border-radius: var(--radius-lg); padding: 1.25rem; margin-bottom: 1rem; color: #fff;">'
+        + '<div style="font-size: 15px; color: rgba(255,255,255,0.8); margin-bottom: 8px;">🌅 자녀들의 60세 예상 자산 (별도)</div>'
+        + '<div style="font-size: 36px; font-weight: 700; color: #AFA9EC; margin-bottom: 8px;">' + fmtShort(totalAge60) + '</div>'
+        + '<div style="font-size: 13px; color: rgba(255,255,255,0.6);">10년 후 달성한 자산이 60세까지 복리로 성장한 예상치</div>'
+        + '<div style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px;">';
+      results.forEach(r => {
+        if (r.input.track === 'youth' && r.result.age60Asset) {
+          html += '<div style="background: rgba(255,255,255,0.1); border-radius: 8px; padding: 10px 14px;">'
+            + '<div style="font-size: 13px; color: rgba(255,255,255,0.7);">🧒 ' + r.member.name + ' (' + r.member.ageAtJoin + '세 가입 → 60세)</div>'
+            + '<div style="font-size: 20px; font-weight: 600; color: #AFA9EC;">' + fmtShort(r.result.age60Asset) + '</div>'
+            + '<div style="font-size: 11px; color: rgba(255,255,255,0.5);">월 수입 ' + Math.round(r.result.totalMonthly) + '만원</div>'
+            + '</div>';
+        }
+      });
+      html += '</div></div>';
+    }
+    html += '<div style="background: var(--bg-primary); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem; margin-bottom: 1rem;"><h3>구성원별 자산</h3><table style="width: 100%; font-size: 13px; border-collapse: collapse;"><thead><tr style="border-bottom: 0.5px solid var(--border);"><th style="text-align:left; padding:8px; font-weight:500; font-size:14px; color:var(--text-secondary);">구성원</th><th style="text-align:left; padding:8px; font-weight:500; font-size:14px; color:var(--text-secondary);">트랙</th><th style="text-align:right; padding:8px; font-weight:500; font-size:14px; color:var(--text-secondary);">납입</th><th style="text-align:right; padding:8px; font-weight:500; font-size:14px; color:var(--text-secondary);">10년 후 자산</th></tr></thead><tbody>';
     results.forEach(r => {
       const paid = r.input.track === 'youth' ? r.input.pay * 120 : r.result.totalPaid;
       html += '<tr style="border-bottom: 0.5px solid var(--border);"><td style="padding:10px 8px;">' + (r.input.track==='youth'?'🧒 ':'👤 ') + r.member.name + ' (' + r.member.ageAtJoin + '세)</td><td style="padding:10px 8px; font-size:12px; color:var(--text-secondary);">' + (r.input.track==='youth' ? '청년' : '시민펀드 ' + r.input.adultRate + '%') + '</td><td style="padding:10px 8px; text-align:right;">' + fmtWon(paid) + '</td><td style="padding:10px 8px; text-align:right; font-weight:500;">' + fmtShort(r.result.total10y) + '</td></tr>';
@@ -1060,7 +1093,7 @@ const PARK_IMAGE_URL = "data:image/jpeg;base64,data:image/jpeg;base64,/9j/4AAQSk
         }
       }, 50);
     }
-    myResult = {family: results, totalAsset, totalPaid, totalReturn, childCount, parentCount}; window.myResult = myResult;
+    myResult = {family: results, totalAsset, totalPaid, totalReturn, childCount, parentCount, totalAge60}; window.myResult = myResult;
   }
 
   window.switchMode = function(mode) {
@@ -1467,6 +1500,18 @@ const PARK_IMAGE_URL = "data:image/jpeg;base64,data:image/jpeg;base64,/9j/4AAQSk
         + '<div style="font-size: 15px; font-weight: 500; margin-bottom: 12px;">🔄 만약에 다른 금액을 넣으면?</div>'
         + buildEasyCompare(age, dist, inflationRate)
         + '</div>'
+        
+        
+        // 담보대출 안내
+        + '<div style="background: var(--bg-info); border-radius: var(--radius-lg); padding: 16px; margin-bottom: 12px;">'
+        + '<div style="font-size: 15px; font-weight: 500; color: var(--text-info); margin-bottom: 8px;">🏦 자산 담보 저금리 대출</div>'
+        + '<div style="font-size: 14px; color: var(--text-info); line-height: 1.7;">'
+        + '결혼·주택·창업·교육이 필요할 때<br>'
+        + '기금 자산을 <strong>담보</strong>로 시중보다 <strong>1~2% 낮은 금리</strong>에 대출받을 수 있습니다.<br>'
+        + '<span style="font-size: 13px;">✅ 기금 안의 내 자산은 그대로 유지됩니다 (해지 없음)<br>'
+        + '✅ 대출금은 별도로 상환하면 됩니다<br>'
+        + '✅ 내 자산은 계속 복리로 불어납니다</span>'
+        + '</div></div>'
         
         + '<div style="text-align: center; margin-top: 12px;">'
         + '<button onclick="setExpertMode(true)" style="padding: 12px 24px; font-size: 14px; background: var(--bg-info); color: var(--text-info); border: 1px solid var(--border); border-radius: 8px;">⚙️ 더 자세히 설정하기 (전문가 모드)</button>'
